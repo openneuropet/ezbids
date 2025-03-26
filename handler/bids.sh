@@ -39,13 +39,22 @@ echo "Creating ezBIDS telemetry files"
 
 # Telemetry (to hard-coded pet2bids server)
 if [ -f $root/validator.json ]; then
-    curl -H 'Content-Type: application/json' -d @$root/validator.json -X POST http://52.87.154.236/telemetry/
+    curl -H 'Content-Type: application/json' -d @$root/validator.json -X POST $pet2bids_server || {
+        echo "Failed to send validator.json to $pet2bids_server"
+        true
+    }
 fi
 
 if [ -f $root/ezBIDS_core_telemetry.json ]; then
-    curl -H 'Content-Type: application/json' -d @$root/ezBIDS_core_telemetry.json -X POST http://52.87.154.236/telemetry/
+    curl -H 'Content-Type: application/json' -d @$root/ezBIDS_core_telemetry.json -X POST $pet2bids_server || {
+        echo "Failed to send ezBIDS_core_telemetry.json to $pet2bids_server"
+        true
+    }
 fi
 
 if [ -f $root/ezBIDS_finalized_telemetry.json ]; then
-    curl -H 'Content-Type: application/json' -d @$root/ezBIDS_finalized_telemetry.json -X POST http://52.87.154.236/telemetry/
+    curl -H 'Content-Type: application/json' -d @$root/ezBIDS_finalized_telemetry.json -X POST $pet2bids_server || {
+        echo "Failed to send ezBIDS_finalized_telemetry.json to $pet2bids_server"
+        true
+    }
 fi

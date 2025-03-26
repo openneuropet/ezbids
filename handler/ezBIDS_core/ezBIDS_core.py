@@ -754,20 +754,22 @@ def find_cog_atlas_tasks(url):
         "test" removed, to make it easier to search the SeriesDescription
         fields for a matching task name.
     """
-    url_contents = urlopen(url)
-    data = json.load(url_contents)
-    # Remove non-alphanumeric terms and "task", "test" substrings
-    tasks = [re.sub("[^A-Za-z0-9]+", "", re.split(" task| test", x["name"])[0]).lower() for x in data]
-    # Remove empty task name terms and ones under 2 characters (b/c hard to detect in SeriesDescription)
-    tasks = [x for x in tasks if len(x) > 2]
-    tasks = sorted(tasks, key=str.casefold)  # sort alphabetically, but ignore case
-
+    try:
+        url_contents = urlopen(url)
+        data = json.load(url_contents)
+        # Remove non-alphanumeric terms and "task", "test" substrings
+        tasks = [re.sub("[^A-Za-z0-9]+", "", re.split(" task| test", x["name"])[0]).lower() for x in data]
+        # Remove empty task name terms and ones under 2 characters (b/c hard to detect in SeriesDescription)
+        tasks = [x for x in tasks if len(x) > 2]
+        tasks = sorted(tasks, key=str.casefold)  # sort alphabetically, but ignore case
+    except:
+        tasks = []
     return tasks
 
 
 def correct_pe(pe_direction, ornt, correction):
     """
-    Equivalent to fMRIPrep’s get_world_pedir (Esteban et al., 2019) function.
+    Equivalent to fMRIPrep's get_world_pedir (Esteban et al., 2019) function.
     Takes phase encoding direction and image orientation to correct
     pe_direction if needed. This correction occurs if pe_direction
     is in "xyz" format instead of "ijk".
@@ -853,7 +855,7 @@ def determine_direction(proper_pe_direction, ornt):
     Parameters
     ----------
     proper_pe_direction : string
-        phase encoding direction in “ijk” format
+        phase encoding direction in "ijk" format
 
     ornt : string
         Value of "".join(nib.aff2axcodes(nii_img.affine)), where "nii_img" is
@@ -1061,20 +1063,21 @@ def generate_dataset_list(uploaded_files_list, exclude_data):
         # Find AcquisitionDateTime
         if "AcquisitionDateTime" in json_data:
             acquisition_date_time = json_data["AcquisitionDateTime"]
+            # Extract date from AcquisitionDateTime
+            acquisition_date = acquisition_date_time.split('T')[0]
         else:
             acquisition_date_time = "0000-00-00T00:00:00.000000"
-
-        # Find AcquisitionDate
-        if "AcquisitionDate" in json_data:
-            acquisition_date = json_data["AcquisitionDate"]
-        else:
             acquisition_date = "0000-00-00"
+
+        # Only check AcquisitionDate if we didn't get it from AcquisitionDateTime
+        if acquisition_date == "0000-00-00" and "AcquisitionDate" in json_data:
+            acquisition_date = json_data["AcquisitionDate"]
 
         # Find AcquisitionTime
         if "AcquisitionTime" in json_data:
             acquisition_time = json_data["AcquisitionTime"]
         else:
-            acquisition_time = acquisition_time = "00:00:00.000000"
+            acquisition_time = "00:00:00.000000"
 
         # Find TimeZero
         if "TimeZero" in json_data and json_data.get("ScanStart", None) == 0:
@@ -1101,7 +1104,7 @@ def generate_dataset_list(uploaded_files_list, exclude_data):
 
         # Find EchoTime
         if "EchoTime" in json_data:
-            echo_time = json_data["EchoTime"]
+            echo_time = json_data["EchoTime"] * 1000
         else:
             echo_time = 0
 
@@ -1936,7 +1939,8 @@ def create_lookup_info():
                                         "anatt1",
                                         "anat_t1",
                                         "3dt1",
-                                        "3d_t1"
+                                        "3d_t1",
+                                        "tse2-5"
                                     ]
                                 )
                                 lookup_dic[datatype][suffix]["conditions"].extend(
@@ -1952,7 +1956,8 @@ def create_lookup_info():
                                         "3dt2",
                                         "3d_t2",
                                         "t2spc",
-                                        "t2_spc"
+                                        "t2_spc",
+                                        "t2_tse"
                                     ]
                                 )
                                 lookup_dic[datatype][suffix]["conditions"].extend(
