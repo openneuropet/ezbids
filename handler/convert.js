@@ -23,6 +23,7 @@ const datasetName = info.datasetDescription.Name;
 
 mkdirp.sync(root + "/bids/" + datasetName);
 fs.writeFileSync(root + "/bids/" + datasetName + "/finalized.json", JSON.stringify(info, null, 4)); //copy the finalized.json
+fs.writeFileSync(root + "/bids/" + datasetName + "/ezBIDS_template.json", JSON.stringify(info, null, 4)); //copy the finalized.json
 fs.writeFileSync(root + "/bids/" + datasetName + "/dataset_description.json", JSON.stringify(info.datasetDescription, null, 4));
 fs.writeFileSync(root + "/bids/" + datasetName + "/.bidsignore", `
 **/excluded
