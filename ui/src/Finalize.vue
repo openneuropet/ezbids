@@ -42,7 +42,7 @@
                     @click="download(`bids/${ezbids.datasetDescription.Name}`)"
                     >Download BIDS</el-button
                 >
-                <el-button style="width: 250px" type="primary" @click="download(`finalized.json`)"
+                <el-button style="width: 250px" type="primary" @click="download(`ezBIDS_template.json`)"
                     >Download configuration/template</el-button
                 >
                 <p>Or send the dataset to other cloud resources.</p>
